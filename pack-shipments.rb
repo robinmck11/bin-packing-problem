@@ -1,4 +1,8 @@
-File.open("SampleData/sampleData.txt") do | file |
+if !ARGV[0]
+  raise "No filename provided to arguments"
+end
+
+File.open(ARGV[0]) do | file |
   file.each_line do | line |
     bin =  [];
     bins = [];
