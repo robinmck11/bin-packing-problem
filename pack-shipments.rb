@@ -32,6 +32,10 @@ File.open(ARGV[0]) do | file |
 
       end
 
+      if index === items.length - 1
+        bins.push([line_item]);
+      end
+
       bins.push bin;
       bin = [];
       bin.push line_item;

@@ -69,5 +69,3 @@ class OrderProcessorFactory
     end
   end
 end
-
-OrderProcessorFactory.processOrders('SampleData/sampleData.txt', 3, 'first_fit').process;
