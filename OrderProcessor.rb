@@ -1,11 +1,11 @@
-require 'parallel';
+require 'parallel'
 
 class OrderProcessor
   attr_reader :fileName, :cores
 
   def initialize(fileName, cores)
     @fileName = fileName
-    @cores = cores;
+    @cores = cores
   end
 
   # Return array of orders
@@ -16,12 +16,12 @@ class OrderProcessor
   end
 
   def splitOrders
-    orders = getOrdersFromFile.each_slice(cores).to_a;
+    orders = getOrdersFromFile.each_slice(cores).to_a
   end
 
   def file_found?
     if !fileName
-      return false;
+      false
     end
   end
 end
@@ -32,8 +32,8 @@ class FirstFitOrderProcessor < OrderProcessor
   end
 
   def processSequential
-    arrays = splitOrders;
-    sum = 0;
+    arrays = splitOrders
+    sum = 0
     arrays.each do | array |
       array.each do |sub_array |
         # Do the work
@@ -43,7 +43,7 @@ class FirstFitOrderProcessor < OrderProcessor
 
   def process
     processOrder = proc do | array |
-      size = 0;
+      size = 0
       array.each do | order |
         # Do the work
       end
@@ -58,7 +58,7 @@ class FirstFitOrderProcessor < OrderProcessor
 
     end
 
-    processOrders.call;
+    processOrders.call
   end
 end
 
