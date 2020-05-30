@@ -8,9 +8,7 @@ class ShippingContext
   end
 
   def shipItems
-    result = @strategy.ship(@data)
-    # For debugging purposes
-    print result
+    @strategy.ship(@data)
   end
 end
 
@@ -27,39 +25,33 @@ class ShippingStrategyFirstFit < ShippingStrategy
 
     # Process each item in the line,
     # add to the bin if the sum of the bin items plus the current item is <= 1
-    items.each_with_index do | line_item, index |
-      line_item = line_item.to_f
+    items.sort.reverse.each_with_index do | item, index |
+      item = item.to_f
 
-      # Push first item to bin
-      if bin.empty?
-        bin.push line_item
+      # Only 1 item to pack?
+      return bins.push([item]) if (items.length == 1)
+
+      # Create first bin
+      if index == 0
+        bin.push item
         next
       end
 
-      # if the sum of the current bin + the current item is < 1
+      # if the sum of the current bin + the current item is <= 1
       # Add the item to the bin
-      if bin.reduce(0) { |sum, num| sum + num } + line_item <= 1
-        bin.push line_item
-
-        # If its the last item to be processed, push to the bins array
-        if index === items.length - 1
-          bins.push bin
-        end
-
-        # There may be more items to add to this bin
-        next
+      # else add the item to a new bin
+      if bin.reduce(0) { |sum, num| sum + num } + item <= 1
+        bin.push item
+      else
+        bins.push bin
+        bin = []
+        bin.push item
       end
 
-      # If we reach this point and it's the last item in the list,
-      # we know we need to create a new bin for this item
-      if index === items.length - 1
-        bins.push([line_item])
+      # Anything left over goes into a new bin
+      if index == items.length - 1
+        bins.push bin
       end
-
-      # Conditon above is false, Create a new bin
-      bins.push bin
-      bin = []
-      bin.push line_item
     end
 
     # Return the items bundled into bins
