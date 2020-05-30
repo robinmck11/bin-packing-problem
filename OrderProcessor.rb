@@ -54,7 +54,7 @@ class FirstFitOrderProcessor < OrderProcessor
     processOrders = proc do
       arrays = splitOrders;
 
-      Parallel.map(arrays, in_processes: arrays.length) { |array|
+      Parallel.map(arrays, in_processes: cores) { |array|
         processOrder.call array
       }
 
