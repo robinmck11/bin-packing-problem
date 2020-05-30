@@ -36,18 +36,16 @@ class FirstFitOrderProcessor < OrderProcessor
     sum = 0;
     arrays.each do | array |
       array.each do |sub_array |
-        p sub_array;
+        # Do the work
       end
     end
   end
 
-  def processFirstFitOrders
-
-    # Test to see that we can process orders in parallel
+  def process
     processOrder = proc do | array |
       size = 0;
       array.each do | order |
-        p order;
+        # Do the work
       end
     end
 
@@ -61,14 +59,15 @@ class FirstFitOrderProcessor < OrderProcessor
     end
 
     processOrders.call;
-
   end
 end
 
-## Sequential Test
-# order_processor = FirstFitOrderProcessor.new('SampleData/sampleData.txt', 3);
-# order_processor.processSequential;
+class OrderProcessorFactory
+  def self.processOrders fileName, cores, type
+    if type == 'first_fit'
+      FirstFitOrderProcessor.new fileName, cores
+    end
+  end
+end
 
-## Parallel test
-order_processor1 = FirstFitOrderProcessor.new('sampleData/sampleData.txt', 50);
-order_processor1.processFirstFitOrders;
+OrderProcessorFactory.processOrders('SampleData/sampleData.txt', 3, 'first_fit').process;
