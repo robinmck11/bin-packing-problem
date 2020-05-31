@@ -1,17 +1,19 @@
 require 'parallel'
+require_relative 'ShippingStrategy';
 
 class OrderProcessor
-  attr_reader :fileName, :cores
+  attr_reader :fileName, :cores, :strategy
 
-  def initialize(fileName, cores)
+  def initialize(fileName, cores, strategy)
     @fileName = fileName
     @cores = cores
+    @strategy = strategy
   end
 
   # Return array of orders
   def getOrdersFromFile
     File.readlines(fileName).map do |line|
-      line.split().sort.reverse.map(&:to_f)
+      line.split().map(&:to_f)
     end
   end
 
@@ -24,48 +26,30 @@ class OrderProcessor
       false
     end
   end
-end
-
-class FirstFitOrderProcessor < OrderProcessor
-  def initialize(filename, cores)
-    super
-  end
 
   def processSequential
     arrays = splitOrders
-    sum = 0
     arrays.each do | array |
-      array.each do |sub_array |
-        # Do the work
+      array.each do |order |
+        ShippingContext.new(strategy, order).shipItems
       end
     end
   end
 
   def process
     processOrder = proc do | array |
-      size = 0
       array.each do | order |
-        # Do the work
+        p ShippingContext.new(strategy, order).shipItems
       end
     end
 
     processOrders = proc do
-      arrays = splitOrders;
-
-      Parallel.map(arrays, in_processes: cores) { |array|
+      Parallel.map(splitOrders, in_processes: cores) { |array|
         processOrder.call array
       }
 
     end
 
     processOrders.call
-  end
-end
-
-class OrderProcessorFactory
-  def self.processOrders fileName, cores, type
-    if type == 'first_fit'
-      FirstFitOrderProcessor.new fileName, cores
-    end
   end
 end
