@@ -39,12 +39,13 @@ class OrderProcessor
   def process
     processOrder = proc do | array |
       array.each do | order |
-        p ShippingContext.new(strategy, order).shipItems
+        ShippingContext.new(strategy, order).shipItems
       end
     end
 
     processOrders = proc do
-      Parallel.map(splitOrders, in_processes: cores) { |array|
+      arrays = splitOrders
+      Parallel.map(arrays, in_processes: arrays.length) { |array|
         processOrder.call array
       }
 
