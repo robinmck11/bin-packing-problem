@@ -15,3 +15,7 @@ sudo apt-get install ruby2.5
 **Install gems**
 
 `bundle install`
+
+# Usage
+
+`ruby bin-packing.rb <file-name>`
