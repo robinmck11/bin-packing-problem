@@ -1,14 +1,15 @@
 class ShippingContext
   attr_writer :strategy
-  attr_reader :data
+  attr_reader :data, :pretty
 
-  def initialize(strategy, data)
+  def initialize(strategy, data, pretty)
     @strategy = strategy
     @data = data
+    @pretty = pretty
   end
 
   def shipItems
-    @strategy.ship(@data)
+    @strategy.ship(@data, @pretty)
   end
 end
 
@@ -18,7 +19,7 @@ class ShippingStrategy
   end
 end
 
-class ShippingStrategyFirstFit < ShippingStrategy
+class ShippingStrategyNextFit < ShippingStrategy
   def ship(items)
     bin =  []
     bins = []
@@ -57,6 +58,54 @@ class ShippingStrategyFirstFit < ShippingStrategy
     # Return the items bundled into bins
     bins
 
+  end
+end
+
+class ShippingStrategyFirstFit < ShippingStrategy
+  def ship(items, pretty)
+    bins = []
+
+    # Process each item in the line,
+    # add to the bin if the sum of the bin items plus the current item is <= 1
+    items.each_with_index do | item, index |
+      item = item.to_f
+
+      # Only 1 item to pack?
+      if (items.length == 1)
+        bins << [item]
+        break
+      end
+
+      # Create first bin
+      if index == 0
+        bins << [item]
+        next
+      end
+
+      binned = false
+
+      # Search through all the bins
+      # if the item fits put it in the bin
+      # else create a new bin
+      bins.each_with_index do | bin, i |
+        if bin.reduce(0) { |sum, num| sum + num } + item <= 1
+          bins[i] << item
+          binned = true
+          break
+        end
+      end
+
+      unless binned
+        bins << [item]
+        binned = true
+      end
+    end
+
+    if pretty
+      raise "Not implemented"
+    else
+      puts "#{bins.map(&:inspect).join(", ")}: #{bins.length} crates required"
+    end
   end
 end
 
